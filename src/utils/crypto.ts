@@ -11,7 +11,7 @@ let cachedKey: CryptoKey | null = null;
 export async function getEncryptionKey(): Promise<CryptoKey> {
   if (cachedKey) return cachedKey;
   
-  cachedKey = await window.crypto.subtle.importKey(
+  cachedKey = await globalThis.crypto.subtle.importKey(
     "raw",
     ENCRYPTION_KEY_BYTES,
     { name: "AES-GCM" },
@@ -23,11 +23,14 @@ export async function getEncryptionKey(): Promise<CryptoKey> {
 }
 
 export async function encryptText(text: string): Promise<string> {
+  return encryptBytes(new TextEncoder().encode(text));
+}
+
+export async function encryptBytes(encodedText: Uint8Array): Promise<string> {
   const key = await getEncryptionKey();
-  const encodedText = new TextEncoder().encode(text);
-  const iv = window.crypto.getRandomValues(new Uint8Array(12));
+  const iv = globalThis.crypto.getRandomValues(new Uint8Array(12));
   
-  const encryptedData = await window.crypto.subtle.encrypt(
+  const encryptedData = await globalThis.crypto.subtle.encrypt(
     {
       name: "AES-GCM",
       iv
@@ -45,6 +48,10 @@ export async function encryptText(text: string): Promise<string> {
 }
 
 export async function decryptText(encryptedText: string): Promise<string> {
+  return new TextDecoder().decode(await decryptBytes(encryptedText));
+}
+
+export async function decryptBytes(encryptedText: string): Promise<Uint8Array> {
   try {
     const key = await getEncryptionKey();
     const combined = Uint8Array.from(atob(encryptedText), c => c.charCodeAt(0));
@@ -53,7 +60,7 @@ export async function decryptText(encryptedText: string): Promise<string> {
     const iv = combined.slice(0, 12);
     const encryptedData = combined.slice(12);
 
-    const decrypted = await window.crypto.subtle.decrypt(
+    const decrypted = await globalThis.crypto.subtle.decrypt(
       {
         name: "AES-GCM",
         iv
@@ -62,7 +69,7 @@ export async function decryptText(encryptedText: string): Promise<string> {
       encryptedData
     );
 
-    return new TextDecoder().decode(decrypted);
+    return new Uint8Array(decrypted);
   } catch (error) {
     console.error('Decryption error:', error);
     throw new Error('Failed to decrypt text');

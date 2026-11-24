@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowsClockwise, List, TextT } from "@phosphor-icons/react";
-import { Participant } from '../types';
+import { Group, Participant } from '../types';
 import { useTranslation } from 'react-i18next';
 import { ParticipantRow } from './ParticipantRow';
 import { ParticipantsTextView } from './ParticipantsTextView';
@@ -8,6 +8,7 @@ import { produce } from 'immer';
 
 interface ParticipantsListProps {
   participants: Record<string, Participant>;
+  groups: Record<string, Group>;
   onChangeParticipants: (newParticipants: Record<string, Participant>) => void;
   onOpenRules: (participantName: string) => void;
   onGeneratePairs: () => void;
@@ -15,6 +16,7 @@ interface ParticipantsListProps {
 
 export function ParticipantsList({
   participants,
+  groups,
   onChangeParticipants,
   onOpenRules,
   onGeneratePairs,
@@ -45,7 +47,7 @@ export function ParticipantsList({
     }));
   };
 
-  const participantsList = [...Object.values(participants), { 
+  const participantsList: Participant[] = [...Object.values(participants), { 
     id: nextParticipantId, 
     name: '', 
     rules: [] 
@@ -63,6 +65,7 @@ export function ParticipantsList({
             key={participant.id}
             participant={participant}
             participantIndex={index}
+            groupName={participant.groupId ? groups[participant.groupId]?.name : undefined}
             isLast={index === Object.keys(participants).length}
             onNameChange={(name) => updateParticipant(participant.id, name)}
             onOpenRules={() => onOpenRules(participant.id)}

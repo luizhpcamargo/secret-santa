@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 function Flag({className, code}: {className?: string, code: string}) {
   const upperCode = code.toUpperCase();
-  const fixedCode = upperCode === `EN` ? `GB` : upperCode;
+  const fixedCode = upperCode === `EN` ? `GB` : upperCode === `PT` ? `BR` : upperCode;
 
   const FlagComponent = Flags[fixedCode as keyof typeof Flags];
   return <FlagComponent className={className} />;

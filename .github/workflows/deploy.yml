@@ -43,6 +43,10 @@ jobs:
         env:
           VITE_BASE_URL: '/${{ github.event.repository.name }}'
 
+      # GitHub Pages has no server-side routing: serve the app for unknown paths (e.g. /pairing)
+      - name: Add SPA fallback
+        run: cp dist/index.html dist/404.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

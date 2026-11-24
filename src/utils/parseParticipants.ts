@@ -101,9 +101,12 @@ export function parseParticipantsText(input: string, existingParticipants?: Reco
       };
     }
 
-    const id = existingParticipants?.[name]?.id ?? crypto.randomUUID();
+    // The text format only carries name, hint and rules: keep everything else
+    // (wishlist, group) of participants that were already there
+    const existing = Object.values(existingParticipants ?? {}).find(p => p.name === name);
+    const id = existing?.id ?? crypto.randomUUID();
     nameToId[name] = id;
-    result[id] = { id, name, hint, rules: [] };
+    result[id] = { id, name, hint, rules: [], wishlist: existing?.wishlist, groupId: existing?.groupId };
   }
 
   // Second pass: process rules

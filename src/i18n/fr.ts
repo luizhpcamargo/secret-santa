@@ -33,7 +33,9 @@ export const fr: Translations = {
     assignment: "Bienvenue, <name/> ! Vous avez été sélectionné(e) pour offrir un cadeau à :",
     loading: "Chargement...",
     error: "Échec du décryptage du message. Le lien pourrait être invalide.",
-    startYourOwn: "Créez Votre Secret Santa !"
+    startYourOwn: "Créez Votre Secret Santa !",
+    wishlistTitle: "Liste de souhaits de {{name}}",
+    wishlistLink: "Voir",
   },
   participants: {
     title: "Participants",
@@ -60,6 +62,15 @@ export const fr: Translations = {
     saveRules: "Enregistrer les Règles",
     hintLabel: 'Suggestions pour le cadeau',
     hintPlaceholder: 'Entrez une indication sur le type de cadeau adapté à ce participant (optionnel)',
+    wishlistLabel: "Liste de souhaits",
+    wishlistHelp: "Idées de cadeaux montrées à la personne qui a tiré celle-ci. Seule la description est obligatoire.",
+    wishTextPlaceholder: "Qu'aimerait-elle ?",
+    wishUrlPlaceholder: "Lien (facultatif)",
+    wishPricePlaceholder: "Prix",
+    addWish: "Ajouter un souhait",
+    removeWish: "Supprimer le souhait",
+    groupLabel: "Groupe",
+    noGroup: "Aucun groupe",
   },
   links: {
     title: "Liens à Partager",
@@ -75,6 +86,13 @@ export const fr: Translations = {
     title: "Paramètres",
     instructions: "Instructions Supplémentaires",
     instructionsPlaceholder: "Par exemple le budget, la date, le lieu...",
-    instructionsHelp: "Elles seront affichées à tous les participants sur leur page d'attribution. Restez concis: cette fonction allonge la taille des liens."
+    instructionsHelp: "Elles seront affichées à tous les participants sur leur page d'attribution. Restez concis: cette fonction allonge la taille des liens.",
+    groups: "Groupes",
+    groupsHelp: "Facultatif. Répartissez les participants en groupes (famille, amis, collègues...) et choisissez dans quels groupes chacun peut tirer. Assignez les personnes à un groupe via leur bouton de réglages. Les longues listes de souhaits allongent les liens.",
+    groupNamePlaceholder: "Nom du groupe",
+    removeGroup: "Supprimer le groupe",
+    unnamedGroup: "(sans nom)",
+    canDraw: "Les membres peuvent tirer des personnes de :",
+    addGroup: "Ajouter un groupe",
   }
 };

@@ -1,15 +1,10 @@
-import { encryptText } from "./crypto";
+import { encodeReceiver } from "./receiverPayload";
 import { ReceiverData } from "../types";
 
-export async function generateAssignmentLink(giver: string, receiver: string, receiverHint?: string, instructions?: string) {
+export async function generateAssignmentLink(giver: string, receiver: ReceiverData, instructions?: string) {
   const baseUrl = `${window.location.origin}${window.location.pathname.replace(/\/[^/]*$/, '')}`;
   
-  // If there's a hint, encrypt a JSON object
-  const dataToEncrypt = receiverHint
-    ? JSON.stringify({ name: receiver, hint: receiverHint } as ReceiverData)
-    : receiver;
-    
-  const encryptedReceiver = await encryptText(dataToEncrypt);
+  const encryptedReceiver = await encodeReceiver(receiver);
   const params = new URLSearchParams({
     from: giver,
     to: encryptedReceiver,

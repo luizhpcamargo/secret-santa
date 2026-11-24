@@ -1,12 +1,12 @@
 import "@fontsource/dancing-script/700.css";
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { decryptText } from '../utils/crypto';
+import { decodeReceiver } from '../utils/receiverPayload';
 import { PostCard } from '../components/PostCard';
 import { Trans, useTranslation } from 'react-i18next';
 import { MenuItem, SideMenu } from '../components/SideMenu';
 import { PageTransition } from '../components/PageTransition';
-import { ArrowLeft, Info } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowSquareOut, Gift, Info } from '@phosphor-icons/react';
 import { motion } from 'framer-motion';
 import CryptoJS from 'crypto-js';
 import { Layout } from "../components/Layout";
@@ -25,19 +25,19 @@ async function loadPairing(searchParams: URLSearchParams): Promise<[string, Rece
   if (searchParams.has(`to`)) {
     const from = searchParams.get('from')!;
     const to = searchParams.get('to')!;
-    const decrypted = await decryptText(to);
-
-    try {
-      // Try to parse as JSON first (new format with hint)
-      const data = JSON.parse(decrypted) as ReceiverData;
-      return [from, data];
-    } catch {
-      // If parsing fails, it's the old format (just the name)
-      return [from, {name: decrypted, hint: undefined} as ReceiverData];
-    }
+    return [from, await decodeReceiver(to)];
   }
 
   throw new Error(`Missing key or to parameter in search params`);
+}
+
+// Links come from the URL, so only ever render real web links
+function isSafeUrl(value: string) {
+  try {
+    return [`http:`, `https:`].includes(new URL(value).protocol);
+  } catch {
+    return false;
+  }
 }
 
 export function Pairing() {
@@ -112,6 +112,35 @@ export function Pairing() {
                     {assignment[1].hint && <p>{assignment[1].hint}</p>}
                     {instructions && <p>{instructions}</p>}
                   </div>
+                </div>
+              )}
+              {!!assignment[1].wishlist?.length && (
+                <div className="mt-6">
+                  <h2 className="flex items-center gap-2 mb-3 text-lg font-bold text-red-700">
+                    <Gift size={22} weight="bold"/>
+                    {t('pairing.wishlistTitle', { name: assignment[1].name })}
+                  </h2>
+                  <ul className="space-y-2">
+                    {assignment[1].wishlist.map((item, index) => (
+                      <li key={index} className="flex items-baseline justify-between gap-3 p-3 bg-gray-50 rounded-lg text-gray-700">
+                        <span className="min-w-0 break-words">{item.text}</span>
+                        <span className="flex flex-none items-center gap-3">
+                          {item.price && <span className="text-gray-500">{item.price}</span>}
+                          {item.url && isSafeUrl(item.url) && (
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-blue-500 underline"
+                            >
+                              {t('pairing.wishlistLink')}
+                              <ArrowSquareOut size={14} weight="bold"/>
+                            </a>
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </PostCard>

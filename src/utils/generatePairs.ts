@@ -1,4 +1,4 @@
-import { Participant, Rule } from "../types";
+import { Group, Participant, Rule } from "../types";
 
 export function checkRules(rules: Rule[]): string | null {
   const mustRules = rules.filter(r => r.type === 'must');
@@ -13,8 +13,23 @@ export function checkRules(rules: Rule[]): string | null {
   return null;
 }
 
-export function generateGenerationHash(participants: Record<string, Participant>): string {
-  return JSON.stringify(Object.values(participants).map(p => ({rules: p.rules, hint: p.hint})));
+export function generateGenerationHash(participants: Record<string, Participant>, groups: Record<string, Group> = {}): string {
+  return JSON.stringify({
+    participants: Object.values(participants).map(p => ({rules: p.rules, hint: p.hint, wishlist: p.wishlist, groupId: p.groupId})),
+    groups: Object.values(groups).map(g => ({id: g.id, canDraw: g.canDraw})),
+  });
+}
+
+export function canGroupDraw(giver: Participant, receiver: Participant, groups: Record<string, Group>): boolean {
+  const giverGroup = giver.groupId ? groups[giver.groupId] : undefined;
+  if (!giverGroup?.canDraw)
+    return true;
+
+  // Members without a group are not restricted by group rules
+  if (!receiver.groupId || !groups[receiver.groupId])
+    return true;
+
+  return giverGroup.canDraw.includes(receiver.groupId);
 }
 
 export type GeneratedPairs = {
@@ -25,7 +40,7 @@ export type GeneratedPairs = {
   }[];
 };
 
-export function generatePairs(participants: Record<string, Participant>): GeneratedPairs | null {
+export function generatePairs(participants: Record<string, Participant>, groups: Record<string, Group> = {}): GeneratedPairs | null {
   const participantIds = Object.keys(participants);
   
   if (participantIds.length < 2) {
@@ -46,11 +61,12 @@ export function generatePairs(participants: Record<string, Participant>): Genera
     const giver = participants[giverId];
     
     // Start with all participants except self as potential receivers
-    const candidates = new Set(participantIds.filter(id => id !== giverId));
+    const candidates = new Set(participantIds.filter(id => id !== giverId && canGroupDraw(giver, participants[id], groups)));
     
     // Handle MUST rules
     const mustRule = giver.rules.find(r => r.type === 'must');
     if (mustRule) {
+      // A MUST rule is explicit, so it wins over group restrictions
       // If there's a MUST rule, this is the only possible receiver
       candidates.clear();
       candidates.add(mustRule.targetParticipantId);
@@ -80,7 +96,7 @@ export function generatePairs(participants: Record<string, Participant>): Genera
   };
 
   pairingGenerations:
-  for (let t = 0; t < 10; t++) {
+  for (let t = 0; t < 200; t++) {
     // Generate pairings
     const finalPairs = new Map<string, string>();
     const candidateReceivers = structuredClone(initialCandidateReceivers);
@@ -121,7 +137,7 @@ export function generatePairs(participants: Record<string, Participant>): Genera
     }));
 
     return {
-      hash: generateGenerationHash(participants),
+      hash: generateGenerationHash(participants, groups),
       pairings
     };
   }
