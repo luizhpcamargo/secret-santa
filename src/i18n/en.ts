@@ -31,7 +31,9 @@ export const en = {
     assignment: "Welcome, <name/>! You have been picked to get a gift for:",
     loading: "Loading...",
     error: "Failed to decrypt the message. The link might be invalid.",
-    startYourOwn: "Start a Secret Santa!"
+    startYourOwn: "Start a Secret Santa!",
+    wishlistTitle: "{{name}}'s wishlist",
+    wishlistLink: "View",
   },
   participants: {
     title: "Participants",
@@ -58,6 +60,15 @@ export const en = {
     saveRules: "Save Rules",
     hintLabel: 'Gift Hint',
     hintPlaceholder: 'Enter a hint about gift preferences (optional)',
+    wishlistLabel: "Wishlist",
+    wishlistHelp: "Gift ideas shown to whoever picked this person. Only the description is required.",
+    wishTextPlaceholder: "What would they like?",
+    wishUrlPlaceholder: "Link (optional)",
+    wishPricePlaceholder: "Price",
+    addWish: "Add wish",
+    removeWish: "Remove wish",
+    groupLabel: "Group",
+    noGroup: "No group",
   },
   links: {
     title: "Links to Share",
@@ -73,6 +84,13 @@ export const en = {
     title: "Settings",
     instructions: "Additional Instructions",
     instructionsPlaceholder: "e.g., budget, date, location...",
-    instructionsHelp: "They will be shown to all participants on their assignment page. Keep it short: it increases the length of the links."
+    instructionsHelp: "They will be shown to all participants on their assignment page. Keep it short: it increases the length of the links.",
+    groups: "Groups",
+    groupsHelp: "Optional. Split participants into groups (family, friends, coworkers...) and choose which groups each one can draw from. Assign people to groups from their settings button. Longer wishlists make links longer.",
+    groupNamePlaceholder: "Group name",
+    removeGroup: "Remove group",
+    unnamedGroup: "(unnamed)",
+    canDraw: "Members can draw people from:",
+    addGroup: "Add group",
   },
 }; 

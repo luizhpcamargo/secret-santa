@@ -3,10 +3,12 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { en } from './en';
 import { fr } from './fr';
+import { pt } from './pt';
 
 export type Translations = typeof en;
 
 const resources = {
+  pt: { translation: pt },
   en: { translation: en },
   fr: { translation: fr }
 } satisfies Record<string, { translation: Translations }>;
@@ -18,7 +20,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'en',
+    fallbackLng: 'pt',
     interpolation: {
       escapeValue: false
     }

@@ -6,7 +6,7 @@ import { AccordionContainer } from '../components/AccordionContainer';
 import { ParticipantsList } from '../components/ParticipantsList';
 import { ParticipantsTextView } from '../components/ParticipantsTextView';
 import { SecretSantaLinks } from '../components/SecretSantaLinks';
-import { Participant, Rule } from '../types';
+import { Group, Participant, Rule } from '../types';
 import { Link } from 'react-router-dom';
 import { PostCard } from '../components/PostCard';
 import { Trans, useTranslation } from 'react-i18next';
@@ -83,6 +83,7 @@ export function Home() {
 
   const [participants, setParticipants] = useLocalStorage<Record<string, Participant>>('secretSantaParticipants', {}, migrateParticipants);
   const [assignments, setAssignments] = useLocalStorage<GeneratedPairs | null>('secretSantaAssignments', null, migrateAssignments);
+  const [groups, setGroups] = useLocalStorage<Record<string, Group>>('secretSantaGroups', {});
   const [instructions, setInstructions] = useLocalStorage<string>('secretSantaInstructions', '');
 
   const [selectedParticipantId, setSelectedParticipantId] = useState<string | null>(null);
@@ -90,7 +91,7 @@ export function Home() {
   const [openSection, setOpenSection] = useState<'participants' | 'links' | 'settings'>('participants');
 
   const handleGeneratePairs = () => {
-    const assignments = generatePairs(participants);
+    const assignments = generatePairs(participants, groups);
     if (assignments === null) {
       alert(Object.keys(participants).length < 2 
         ? t('errors.needMoreParticipants')
@@ -101,6 +102,18 @@ export function Home() {
 
     setAssignments(assignments);
     setOpenSection('links');
+  };
+
+  const handleChangeGroups = (newGroups: Record<string, Group>) => {
+    setGroups(newGroups);
+
+    // Members of a deleted group go back to having no group
+    if (Object.values(participants).some(p => p.groupId && !newGroups[p.groupId])) {
+      setParticipants(Object.fromEntries(Object.entries(participants).map(([id, p]) => [
+        id,
+        p.groupId && !newGroups[p.groupId] ? {...p, groupId: undefined} : p,
+      ])));
+    }
   };
 
   const menuItems = [
@@ -167,6 +180,7 @@ export function Home() {
               ) : (
                 <ParticipantsList
                   participants={participants}
+                  groups={groups}
                   onChangeParticipants={setParticipants}
                   onOpenRules={(id) => {
                     setSelectedParticipantId(id);
@@ -185,6 +199,8 @@ export function Home() {
               <Settings
                 instructions={instructions}
                 onChangeInstructions={setInstructions}
+                groups={groups}
+                onChangeGroups={handleChangeGroups}
               />
             </Accordion>
 
@@ -198,6 +214,7 @@ export function Home() {
                   assignments={assignments}
                   instructions={instructions}
                   participants={participants}
+                  groups={groups}
                   onGeneratePairs={handleGeneratePairs}
                 />
               </Accordion>
@@ -211,6 +228,7 @@ export function Home() {
         isOpen={isRulesModalOpen}
         onClose={() => setIsRulesModalOpen(false)}
         participants={participants}
+        groups={groups}
         participantId={selectedParticipantId}
         onChangeParticipants={setParticipants}
       />
